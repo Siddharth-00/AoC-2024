@@ -1,0 +1,4 @@
+(library
+ (name AoC)
+ (libraries base core)
+ (modules day1 utils))
