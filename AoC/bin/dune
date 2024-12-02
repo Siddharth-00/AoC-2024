@@ -2,3 +2,8 @@
  (public_name Day1)
  (name day1)
  (libraries AoC))
+
+(executable
+ (public_name Day2)
+ (name day2)
+ (libraries AoC))

@@ -14,3 +14,7 @@ let read_file_as_split_ints filename =
          | [ x; y ] -> (Int.of_string x, Int.of_string y)
          | _ -> failwithf "Malformed line: %s" s ())
   |> List.unzip
+
+let read_file_as_2d_matrix filename =
+  read_file_lines filename
+  |> List.map ~f:(fun s -> String.split ~on:' ' s |> List.map ~f:Int.of_string)
