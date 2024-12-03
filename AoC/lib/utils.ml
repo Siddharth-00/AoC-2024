@@ -1,5 +1,6 @@
 open Core
 
+let read_file_as_string = In_channel.read_all
 let read_file_lines = In_channel.read_lines
 
 let read_file_as_ints filename =
