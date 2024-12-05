@@ -25,3 +25,17 @@ let read_file_as_2d_char_matrix filename =
 
 let print_2d_matrix grid ~f =
   List.map grid ~f:(List.to_string ~f) |> List.iter ~f:print_endline
+
+let rec intersperce y ys =
+  match ys with
+  | [] -> [ [ y ] ]
+  | y' :: ys' ->
+      (y :: y' :: ys') :: List.map (intersperce y ys') ~f:(fun zs -> y' :: zs)
+
+let rec permutations = function
+  | [] -> []
+  | [ x ] -> [ [ x ] ]
+  | x :: xs ->
+      permutations xs
+      |> List.map ~f:(fun perm -> intersperce x perm)
+      |> List.concat
