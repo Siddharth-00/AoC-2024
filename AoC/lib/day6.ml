@@ -1,9 +1,9 @@
 open Core
 
 module Direction = struct
-  type t = Up | Down | Left | Right
+  type t = Up | Down | Left | Right [@@deriving compare, sexp]
 
-  let to_char = function Up -> '^' | Down -> 'v' | Left -> '<' | Right -> '>'
+  let _to_char = function Up -> '^' | Down -> 'v' | Left -> '<' | Right -> '>'
 
   let of_char = function
     | '^' -> Some Up
@@ -23,22 +23,6 @@ module Direction = struct
     | Right -> Down
     | Down -> Left
     | Left -> Up
-
-  let to_int = function Up -> 0 | Right -> 1 | Down -> 2 | Left -> 3
-  let compare x y = Int.compare (to_int x) (to_int y)
-
-  let sexp_of_t = function
-    | Up -> Sexp.of_string "Up"
-    | Down -> Sexp.of_string "Down"
-    | Right -> Sexp.of_string "Right"
-    | Left -> Sexp.of_string "Left"
-
-  let t_of_sexp = function
-    | Sexp.Atom "Up" -> Up
-    | Sexp.Atom "Right" -> Right
-    | Sexp.Atom "Down" -> Down
-    | Sexp.Atom "Left" -> Left
-    | _ -> failwith "Error parsing direction to sexp"
 end
 
 module Grid = struct
@@ -82,27 +66,11 @@ let starting_position grid =
       Array.findi row ~f:(fun _j -> is_starting_position)
       |> Option.map ~f:(Tuple2.create i))
 
-module Position = struct
-  module T = struct
-    type t = int * int
-
-    let compare = Tuple2.compare ~cmp1:Int.compare ~cmp2:Int.compare
-    let sexp_of_t = Tuple2.sexp_of_t Int.sexp_of_t Int.sexp_of_t
-    let t_of_sexp = Tuple2.t_of_sexp Int.t_of_sexp Int.t_of_sexp
-  end
-
-  include T
-  include Comparable.Make (T)
-end
-
 module Position_with_dir = struct
   module T = struct
-    type t = Position.t * Direction.t
+    type t = Utils.Position.t * Direction.t [@@deriving compare, sexp]
 
     let create position direction = (position, direction)
-    let compare = Tuple2.compare ~cmp1:Position.compare ~cmp2:Direction.compare
-    let t_of_sexp = Tuple2.t_of_sexp Position.t_of_sexp Direction.t_of_sexp
-    let sexp_of_t = Tuple2.sexp_of_t Position.sexp_of_t Direction.sexp_of_t
   end
 
   include T
@@ -133,7 +101,7 @@ let distinct_positions grid =
       (Position_with_dir.Set.singleton (Position_with_dir.create (i, j) dir))
   with
   | `Out_of_bounds visited_with_dir | `Cycle visited_with_dir ->
-      Position.Set.map visited_with_dir ~f:fst
+      Utils.Position.Set.map visited_with_dir ~f:fst
 
 let num_distinct_positions grid = distinct_positions grid |> Set.length
 
@@ -152,9 +120,7 @@ let num_blockages_with_cycle grid =
     { Grid.grid; current_position = (i, j); current_direction = dir }
   in
   let distinct_positions = distinct_positions grid in
-  let distinct_positions =
-    Set.remove distinct_positions ((i, j) : Position.t)
-  in
+  let distinct_positions = Set.remove distinct_positions (i, j) in
   Set.count distinct_positions ~f:(fun p ->
       add_blockage grid_t p;
       match

@@ -42,18 +42,6 @@ let find_xmas grid =
   in
   List.sum (module Int) grids ~f:find_xmas_horizontal
 
-module T = struct
-  module T' = struct
-    type t = int * int
-
-    let compare = Tuple2.compare ~cmp1:Int.compare ~cmp2:Int.compare
-    let sexp_of_t = Tuple2.sexp_of_t Int.sexp_of_t Int.sexp_of_t
-    let t_of_sexp = Tuple2.t_of_sexp Int.t_of_sexp Int.t_of_sexp
-  end
-
-  include Comparable.Make (T')
-end
-
 let find_x_mas' grid =
   let m, n = (List.length grid, List.length (List.hd_exn grid)) in
   let diag0 = get_diagonal_matrix grid in
@@ -83,8 +71,8 @@ let find_x_mas' grid =
         else (j, n - 1 - (i % (m - 1)) - j))
   in
 
-  let sam_indices_set0 = T.Set.of_list sam_indices0 in
-  let sam_indices_set1 = T.Set.of_list sam_indices1 in
+  let sam_indices_set0 = Utils.Position.Set.of_list sam_indices0 in
+  let sam_indices_set1 = Utils.Position.Set.of_list sam_indices1 in
   Set.inter sam_indices_set0 sam_indices_set1 |> Set.length
 
 let find_x_mas grid =

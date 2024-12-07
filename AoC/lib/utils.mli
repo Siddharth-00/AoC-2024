@@ -1,4 +1,13 @@
+open Core
+
+module Position : sig
+  type t = int * int [@@deriving compare, sexp]
+
+  include Comparable.S with type t := t
+end
+
 val read_file_as_string : string -> string
+val read_file_lines : string -> string list
 val read_file_as_ints : string -> int list
 val read_file_as_split_ints : string -> int list * int list
 val read_file_as_2d_int_matrix : string -> int list list

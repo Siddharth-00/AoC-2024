@@ -1,7 +1,7 @@
 open Core
 
 let read_file_as_string = In_channel.read_all
-let read_file_lines = In_channel.read_lines
+let read_file_lines s = In_channel.read_lines s
 
 let read_file_as_ints filename =
   read_file_lines filename |> List.map ~f:Int.of_string
@@ -39,3 +39,12 @@ let rec permutations = function
       permutations xs
       |> List.map ~f:(fun perm -> intersperce x perm)
       |> List.concat
+
+module Position = struct
+  module T = struct
+    type t = int * int [@@deriving compare, sexp]
+  end
+
+  include T
+  include Comparable.Make (T)
+end

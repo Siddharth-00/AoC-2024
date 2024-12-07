@@ -1,3 +1,5 @@
 (library
  (name AoC)
+ (preprocess
+  (pps ppx_jane))
  (libraries base core re))
