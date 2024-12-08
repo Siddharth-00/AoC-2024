@@ -47,4 +47,7 @@ module Position = struct
 
   include T
   include Comparable.Make (T)
+
+  let add (i, j) (i', j') = (i + i', j + j')
+  let dist (i, j) (i', j') = (i' - i, j' - j)
 end

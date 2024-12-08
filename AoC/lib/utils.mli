@@ -4,6 +4,9 @@ module Position : sig
   type t = int * int [@@deriving compare, sexp]
 
   include Comparable.S with type t := t
+
+  val add : t -> t -> t
+  val dist : t -> t -> t
 end
 
 val read_file_as_string : string -> string
