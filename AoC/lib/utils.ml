@@ -59,37 +59,36 @@ module Position = struct
   let dist (i, j) (i', j') = (i' - i, j' - j)
 end
 
-let memoize2_recursive (type a b c) (module T : Hashable.S with type t = a)
-    (module T' : Hashable.S with type t = b) f =
-  let cache = T.Table.create () in
+module type Arg = sig
+  type t [@@deriving sexp, compare, hash]
+end
+
+let memoize2_recursive (type a b c) (module T : Arg with type t = a)
+    (module T' : Arg with type t = b) f =
+  let module T'' = Hashable.Make (struct
+    type t = T.t * T'.t [@@deriving sexp, compare, hash]
+  end) in
+  let cache = T''.Table.create () in
   let rec memoized x y =
-    match Hashtbl.find cache x with
-    | Some inner_table -> (
-        match Hashtbl.find inner_table y with
-        | Some res -> res
-        | None ->
-            let res = f memoized x y in
-            let _ = Hashtbl.add inner_table ~key:y ~data:res in
-            res)
+    match Hashtbl.find cache (x, y) with
+    | Some res -> res
     | None ->
         let res = f memoized x y in
-        let inner_table = T'.Table.create () in
-        let _ = Hashtbl.add cache ~key:x ~data:inner_table in
-        let _ = Hashtbl.add inner_table ~key:y ~data:res in
+        let _ = Hashtbl.add cache ~key:(x, y) ~data:res in
         res
   in
   memoized
 
-let memoize2 (type a b c) (module T : Hashable.S with type t = a)
-    (module T' : Hashable.S with type t = b) f =
+let memoize2 (type a b c) (module T : Arg with type t = a)
+    (module T' : Arg with type t = b) f =
   memoize2_recursive (module T) (module T') (fun _recurse -> f)
 
-let memoize_recursive (type a b c) (module T : Hashable.S with type t = a) f =
+let memoize_recursive (type a b c) (module T : Arg with type t = a) f =
   memoize2_recursive
     (module Unit)
     (module T)
     (fun recurse () x -> f (recurse ()) x)
     ()
 
-let memoize (type a b) (module T : Hashable.S with type t = a) f =
+let memoize (type a b) (module T : Arg with type t = a) f =
   memoize_recursive (module T) (fun _recurse -> f)
