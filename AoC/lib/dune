@@ -2,4 +2,4 @@
  (name AoC)
  (preprocess
   (pps ppx_jane))
- (libraries base core re))
+ (libraries base core re num))

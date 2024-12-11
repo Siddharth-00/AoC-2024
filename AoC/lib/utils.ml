@@ -16,9 +16,15 @@ let read_file_as_split_ints filename =
          | _ -> failwithf "Malformed line: %s" s ())
   |> List.unzip
 
-let read_file_as_2d_int_matrix filename =
+let read_file_as_2d_int_matrix_split_with_spaces filename =
   read_file_lines filename
   |> List.map ~f:(fun s -> String.split ~on:' ' s |> List.map ~f:Int.of_string)
+
+let read_file_as_2d_int_matrix filename =
+  read_file_lines filename
+  |> List.map ~f:(fun s ->
+         String.to_list s
+         |> List.map ~f:(fun c -> Char.to_int c - Char.to_int '0'))
 
 let read_file_as_2d_char_matrix filename =
   read_file_lines filename |> List.map ~f:String.to_list
